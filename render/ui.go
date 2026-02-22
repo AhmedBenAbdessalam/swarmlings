@@ -41,17 +41,15 @@ func initFonts() {
 func BuildUI(world *sim.World, cfg *config.Config, scale float64) ebitenui.UI {
 	initFonts()
 
-	// Scale helpers
 	s := func(base int) int { return int(math.Round(float64(base) * scale)) }
 	sf := func(base float64) float64 { return base * scale }
 
-	// Create faces — each must be its own variable (pointer semantics)
+	// Each face must be its own variable (pointer semantics)
 	var labelFace text.Face = &text.GoTextFace{Source: regularSrc, Size: sf(13)}
 	var headerFace text.Face = &text.GoTextFace{Source: regularSrc, Size: sf(14)}
 	var titleFace text.Face = &text.GoTextFace{Source: regularSrc, Size: sf(15)}
 	var valueFace text.Face = &text.GoTextFace{Source: monoSrc, Size: sf(13)}
 
-	// Color palette
 	panelBG := color.NRGBA{20, 20, 24, 220}
 	panelBorder := color.NRGBA{60, 60, 70, 255}
 	separatorColor := color.NRGBA{50, 50, 60, 255}
@@ -64,7 +62,6 @@ func BuildUI(world *sim.World, cfg *config.Config, scale float64) ebitenui.UI {
 	trackColor := color.NRGBA{45, 45, 55, 255}
 	inputBG := color.NRGBA{12, 12, 16, 255}
 	inputBorder := color.NRGBA{50, 50, 60, 255}
-	// Shared widget images
 	sliderTrack := &widget.SliderTrackImage{
 		Idle:  image.NewNineSliceColor(trackColor),
 		Hover: image.NewNineSliceColor(color.NRGBA{55, 55, 65, 255}),
@@ -82,7 +79,6 @@ func BuildUI(world *sim.World, cfg *config.Config, scale float64) ebitenui.UI {
 		Caret: accentTeal,
 	}
 
-	// Helper: separator line
 	makeSeparator := func() *widget.Container {
 		return widget.NewContainer(
 			widget.ContainerOpts.Layout(widget.NewRowLayout(
@@ -96,7 +92,6 @@ func BuildUI(world *sim.World, cfg *config.Config, scale float64) ebitenui.UI {
 		)
 	}
 
-	// Helper: section header
 	makeHeader := func(title string) *widget.Container {
 		c := widget.NewContainer(
 			widget.ContainerOpts.Layout(widget.NewRowLayout(
@@ -111,7 +106,6 @@ func BuildUI(world *sim.World, cfg *config.Config, scale float64) ebitenui.UI {
 		return c
 	}
 
-	// Helper: parameter row (label + slider + text input)
 	makeRow := func(label string, minVal, maxVal float64, cfgField *float64, formatStr string, apply func(float64)) *widget.Container {
 		var input *widget.TextInput
 		var slider *widget.Slider
@@ -176,7 +170,6 @@ func BuildUI(world *sim.World, cfg *config.Config, scale float64) ebitenui.UI {
 			}),
 		)
 
-		// Label in a fixed-width container for alignment
 		labelContainer := widget.NewContainer(
 			widget.ContainerOpts.Layout(widget.NewRowLayout(
 				widget.RowLayoutOpts.Direction(widget.DirectionHorizontal),
@@ -200,12 +193,10 @@ func BuildUI(world *sim.World, cfg *config.Config, scale float64) ebitenui.UI {
 		return row
 	}
 
-	// Root container (anchor layout, full screen)
 	rootContainer := widget.NewContainer(
 		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
 	)
 
-	// Right-side panel
 	pad := s(10)
 	panel := widget.NewContainer(
 		widget.ContainerOpts.BackgroundImage(image.NewBorderedNineSliceColor(panelBG, panelBorder, 1)),
@@ -224,13 +215,9 @@ func BuildUI(world *sim.World, cfg *config.Config, scale float64) ebitenui.UI {
 		),
 	)
 
-	// Title
 	panel.AddChild(widget.NewText(widget.TextOpts.Text("Boid Parameters", &titleFace, textPrimary)))
-
-	// Separator
 	panel.AddChild(makeSeparator())
 
-	// Forces section
 	panel.AddChild(makeHeader("Forces"))
 	panel.AddChild(makeRow("Avoid", 0, 2.0, &cfg.AvoidanceFactor, "%.3f", func(v float64) {
 		world.AvoidanceFactor = v
@@ -242,10 +229,8 @@ func BuildUI(world *sim.World, cfg *config.Config, scale float64) ebitenui.UI {
 		world.GatheringFactor = v
 	}))
 
-	// Separator
 	panel.AddChild(makeSeparator())
 
-	// Radii section
 	panel.AddChild(makeHeader("Radii"))
 	panel.AddChild(makeRow("Avoid R", 0, 100, &cfg.AvoidanceRadius, "%.0f", func(v float64) {
 		world.AvoidanceRadius = v
@@ -254,19 +239,15 @@ func BuildUI(world *sim.World, cfg *config.Config, scale float64) ebitenui.UI {
 		world.DetectionRadius = v
 	}))
 
-	// Separator
 	panel.AddChild(makeSeparator())
 
-	// Speed section
 	panel.AddChild(makeHeader("Speed"))
 	panel.AddChild(makeRow("Max", 0, 10, &cfg.MaxSpeed, "%.1f", func(v float64) {
 		world.MaxSpeed = v
 	}))
 
-	// Separator
 	panel.AddChild(makeSeparator())
 
-	// Save button (centered)
 	btnContainer := widget.NewContainer(
 		widget.ContainerOpts.Layout(widget.NewRowLayout(
 			widget.RowLayoutOpts.Direction(widget.DirectionHorizontal),

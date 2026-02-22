@@ -12,6 +12,8 @@ type World struct {
 	DetectionRadius float64
 	AvoidanceRadius float64
 	MaxSpeed        float64
+	grid            *Grid
+	neighbors       []Boid
 }
 
 func New(boids []Boid, w, h int) World {
@@ -29,20 +31,28 @@ func New(boids []Boid, w, h int) World {
 }
 
 func (w *World) Update() {
+	cellSize := w.DetectionRadius
+	if cellSize < 1 {
+		cellSize = 1
+	}
+
+	if w.grid == nil || w.grid.NeedsRebuild(w.Width, w.Height, cellSize) {
+		w.grid = NewGrid(w.Width, w.Height, cellSize)
+	}
+	w.grid.Populate(w.Boids)
+
 	for i := range w.Boids {
-		// avoid other boids
-		vx, vy := w.Boids[i].Avoid(w.Boids, i, w.AvoidanceFactor, w.AvoidanceRadius)
-		// align with other boids
-		vx2, vy2 := w.Boids[i].Align(w.Boids, i, w.AlignmentFactor, w.DetectionRadius)
+		w.neighbors = w.grid.Neighbors(w.Boids[i].X, w.Boids[i].Y, i, w.Boids, w.neighbors)
+
+		vx, vy := w.Boids[i].Avoid(w.neighbors, w.AvoidanceFactor, w.AvoidanceRadius)
+		vx2, vy2 := w.Boids[i].Align(w.neighbors, w.AlignmentFactor, w.DetectionRadius)
 		vx += vx2
 		vy += vy2
-		// gather with other boids
-		vx2, vy2 = w.Boids[i].Gather(w.Boids, i, w.GatheringFactor, w.DetectionRadius)
+		vx2, vy2 = w.Boids[i].Gather(w.neighbors, w.GatheringFactor, w.DetectionRadius)
 		vx += vx2
 		vy += vy2
 		w.Boids[i].VX += vx
 		w.Boids[i].VY += vy
-		// limit speed
 		speed := math.Hypot(w.Boids[i].VX, w.Boids[i].VY)
 		if speed > w.MaxSpeed {
 			w.Boids[i].VX = w.Boids[i].VX / speed * w.MaxSpeed

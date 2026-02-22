@@ -10,31 +10,26 @@ func (b *Boid) Move() {
 	b.Y += b.VY
 }
 
-// collision avoidance
-func (b *Boid) Avoid(others []Boid, index int, factor, avoidanceRadius float64) (vx float64, vy float64) {
-	for i, other := range others {
-		if i != index {
-			dx := other.X - b.X
-			dy := other.Y - b.Y
-			distsq := DistanceSquared(b.X, b.Y, other.X, other.Y)
-			if distsq < avoidanceRadius*avoidanceRadius {
-				vx -= dx / distsq
-				vy -= dy / distsq
-			}
+func (b *Boid) Avoid(neighbors []Boid, factor, avoidanceRadius float64) (vx float64, vy float64) {
+	for _, other := range neighbors {
+		dx := other.X - b.X
+		dy := other.Y - b.Y
+		distsq := DistanceSquared(b.X, b.Y, other.X, other.Y)
+		if distsq < avoidanceRadius*avoidanceRadius {
+			vx -= dx / distsq
+			vy -= dy / distsq
 		}
 	}
 	return vx * factor, vy * factor
 }
 
-func (b *Boid) Align(others []Boid, index int, factor, detectionRadius float64) (vx float64, vy float64) {
+func (b *Boid) Align(neighbors []Boid, factor, detectionRadius float64) (vx float64, vy float64) {
 	averageVX, averageVY, count := 0.0, 0.0, 0
-	for i, other := range others {
-		if i != index {
-			if DistanceSquared(b.X, b.Y, other.X, other.Y) < detectionRadius*detectionRadius {
-				averageVX += other.VX
-				averageVY += other.VY
-				count++
-			}
+	for _, other := range neighbors {
+		if DistanceSquared(b.X, b.Y, other.X, other.Y) < detectionRadius*detectionRadius {
+			averageVX += other.VX
+			averageVY += other.VY
+			count++
 		}
 	}
 	if count == 0 {
@@ -45,15 +40,13 @@ func (b *Boid) Align(others []Boid, index int, factor, detectionRadius float64) 
 	return (averageVX - b.VX) * factor, (averageVY - b.VY) * factor
 }
 
-func (b *Boid) Gather(others []Boid, index int, factor, detectionRadius float64) (vx float64, vy float64) {
+func (b *Boid) Gather(neighbors []Boid, factor, detectionRadius float64) (vx float64, vy float64) {
 	averageX, averageY, count := 0.0, 0.0, 0
-	for i, other := range others {
-		if i != index {
-			if DistanceSquared(b.X, b.Y, other.X, other.Y) < detectionRadius*detectionRadius {
-				averageX += other.X
-				averageY += other.Y
-				count++
-			}
+	for _, other := range neighbors {
+		if DistanceSquared(b.X, b.Y, other.X, other.Y) < detectionRadius*detectionRadius {
+			averageX += other.X
+			averageY += other.Y
+			count++
 		}
 	}
 	if count == 0 {

@@ -92,7 +92,6 @@ func (g *Game) drawBoid(screen *ebiten.Image, boid sim.Boid, texture *ebiten.Ima
 
 	screen.DrawTriangles(vertices, []uint16{0, 1, 2}, texture, nil)
 
-	// debug stuff
 	if g.DebugMode {
 		vector.StrokeCircle(screen, float32(boid.X), float32(boid.Y), float32(g.World.DetectionRadius), 1, color.RGBA{80, 80, 80, 80}, true)
 		vector.StrokeCircle(screen, float32(boid.X), float32(boid.Y), float32(g.World.AvoidanceRadius), 1, color.RGBA{0, 180, 0, 80}, true)

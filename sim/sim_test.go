@@ -1,6 +1,11 @@
 package sim
 
-import "testing"
+import (
+	"fmt"
+	"math"
+	"math/rand"
+	"testing"
+)
 
 func TestBound(t *testing.T) {
 	testCases := []struct {
@@ -44,13 +49,83 @@ func TestBound(t *testing.T) {
 	}
 }
 
-func BenchmarkUpdate(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		boids := make([]Boid, 10000)
-		for j := range boids {
-			boids[j] = Boid{X: float64(j), Y: float64(j), VX: 1, VY: 1}
+// updateBruteForce is the original O(n²) implementation for equivalence testing.
+func updateBruteForce(w *World) {
+	others := make([]Boid, len(w.Boids)-1)
+	for i := range w.Boids {
+		copy(others[:i], w.Boids[:i])
+		copy(others[i:], w.Boids[i+1:])
+
+		vx, vy := w.Boids[i].Avoid(others, w.AvoidanceFactor, w.AvoidanceRadius)
+		vx2, vy2 := w.Boids[i].Align(others, w.AlignmentFactor, w.DetectionRadius)
+		vx += vx2
+		vy += vy2
+		vx2, vy2 = w.Boids[i].Gather(others, w.GatheringFactor, w.DetectionRadius)
+		vx += vx2
+		vy += vy2
+		w.Boids[i].VX += vx
+		w.Boids[i].VY += vy
+		speed := math.Hypot(w.Boids[i].VX, w.Boids[i].VY)
+		if speed > w.MaxSpeed {
+			w.Boids[i].VX = w.Boids[i].VX / speed * w.MaxSpeed
+			w.Boids[i].VY = w.Boids[i].VY / speed * w.MaxSpeed
 		}
-		world := New(boids, 1000, 1000)
-		world.Update()
+		w.Boids[i].Move()
+		w.Boids[i].Wrap(w.Width, w.Height)
+	}
+}
+
+func TestGridEquivalence(t *testing.T) {
+	rng := rand.New(rand.NewSource(99))
+	n := 200
+	boids1 := make([]Boid, n)
+	boids2 := make([]Boid, n)
+	for i := range boids1 {
+		b := Boid{
+			X:  rng.Float64() * 1000,
+			Y:  rng.Float64() * 1000,
+			VX: rng.Float64()*4 - 2,
+			VY: rng.Float64()*4 - 2,
+		}
+		boids1[i] = b
+		boids2[i] = b
+	}
+
+	grid := New(boids1, 1000, 1000)
+	brute := New(boids2, 1000, 1000)
+
+	grid.Update()
+	updateBruteForce(&brute)
+
+	for i := range boids1 {
+		g := grid.Boids[i]
+		b := brute.Boids[i]
+		if math.Abs(g.X-b.X) > 1e-9 || math.Abs(g.Y-b.Y) > 1e-9 ||
+			math.Abs(g.VX-b.VX) > 1e-9 || math.Abs(g.VY-b.VY) > 1e-9 {
+			t.Errorf("boid %d diverged:\n  grid:  {X:%.6f Y:%.6f VX:%.6f VY:%.6f}\n  brute: {X:%.6f Y:%.6f VX:%.6f VY:%.6f}",
+				i, g.X, g.Y, g.VX, g.VY, b.X, b.Y, b.VX, b.VY)
+		}
+	}
+}
+
+func BenchmarkUpdate(b *testing.B) {
+	for _, n := range []int{500, 1000, 5000, 10000, 20000} {
+		b.Run(fmt.Sprintf("N=%d", n), func(b *testing.B) {
+			rng := rand.New(rand.NewSource(42))
+			boids := make([]Boid, n)
+			for j := range boids {
+				boids[j] = Boid{
+					X:  rng.Float64() * 1000,
+					Y:  rng.Float64() * 1000,
+					VX: rng.Float64()*2 - 1,
+					VY: rng.Float64()*2 - 1,
+				}
+			}
+			world := New(boids, 1000, 1000)
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				world.Update()
+			}
+		})
 	}
 }

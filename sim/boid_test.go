@@ -41,7 +41,7 @@ func TestAvoid(t *testing.T) {
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-			vx, vy := tC.Boid.Avoid(tC.Boids, 0, 1.0, 20)
+			vx, vy := tC.Boid.Avoid(tC.Boids[1:], 1.0, 20)
 			if vx != tC.expectedVX || vy != tC.expectedVY {
 				t.Errorf("expected boid velocity to be vx=%v, vy=%v, but got vx=%v, vy=%v", tC.expectedVX, tC.expectedVY, vx, vy)
 			}
@@ -86,7 +86,7 @@ func TestAlign(t *testing.T) {
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-			vx, vy := tC.Boid.Align(tC.Boids, 0, 1.0, 20)
+			vx, vy := tC.Boid.Align(tC.Boids[1:], 1.0, 20)
 			if vx != tC.expectedVX || vy != tC.expectedVY {
 				t.Errorf("expected boid velocity to be vx=%v, vy=%v, but got vx=%v, vy=%v", tC.expectedVX, tC.expectedVY, vx, vy)
 			}
@@ -131,7 +131,7 @@ func TestGather(t *testing.T) {
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-			vx, vy := tC.Boid.Gather(tC.Boids, 0, 1.0, 20)
+			vx, vy := tC.Boid.Gather(tC.Boids[1:], 1.0, 20)
 			if vx != tC.expectedVX || vy != tC.expectedVY {
 				t.Errorf("expected boid velocity to be vx=%v, vy=%v, but got vx=%v, vy=%v", tC.expectedVX, tC.expectedVY, vx, vy)
 			}

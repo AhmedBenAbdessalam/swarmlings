@@ -12,8 +12,7 @@ import (
 )
 
 func main() {
-	// initialize dots
-	boids := make([]sim.Boid, 500)
+	boids := make([]sim.Boid, 1000)
 	world := sim.New(boids, 800, 600)
 	for i := range world.Boids {
 		world.Boids[i] = sim.Boid{
@@ -27,7 +26,6 @@ func main() {
 
 	cfg := config.Load()
 
-	// apply config to world
 	world.AvoidanceFactor = cfg.AvoidanceFactor
 	world.AlignmentFactor = cfg.AlignmentFactor
 	world.GatheringFactor = cfg.GatheringFactor
@@ -37,7 +35,6 @@ func main() {
 
 	ui := render.BuildUI(&world, &cfg, 1.0)
 
-	// create game instance
 	texture := ebiten.NewImage(1, 1)
 	texture.Fill(color.White)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
