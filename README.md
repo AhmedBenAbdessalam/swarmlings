@@ -1,6 +1,6 @@
-# Boids Evolution Simulator
+# Swarmlings
 
-Boid flocking sim in Go with Ebitengine. The end goal is boids with neural net brains that evolve through natural selection, rendered with GPU shaders.
+Flocking sim in Go with Ebitengine. The end goal is little critters with neural net brains that evolve through natural selection, rendered with GPU shaders.
 
 ## Roadmap
 
@@ -8,6 +8,7 @@ Boid flocking sim in Go with Ebitengine. The end goal is boids with neural net b
 - [x] Triangle rendering with debug overlays for detection/avoidance radii
 - [x] In-game UI for tweaking parameters, saved to `config.json`
 - [ ] Spatial partitioning (grid or quadtree) to get past the O(n^2) neighbor check
+- [ ] Assets (sprites, sounds, etc.)
 - [ ] Ecosystem: food, energy, death, reproduction
 - [ ] Predators with predator-prey dynamics
 - [ ] Evolvable genomes with mutation and natural selection

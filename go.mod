@@ -1,4 +1,4 @@
-module boids
+module swarmlings
 
 go 1.25.6
 

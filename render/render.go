@@ -1,8 +1,8 @@
 package render
 
 import (
-	"boids/config"
-	"boids/sim"
+	"swarmlings/config"
+	"swarmlings/sim"
 	"fmt"
 	"image/color"
 	"math"

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"boids/config"
-	"boids/render"
-	"boids/sim"
+	"swarmlings/config"
+	"swarmlings/render"
+	"swarmlings/sim"
 	"image/color"
 	"log"
 	"math/rand"
