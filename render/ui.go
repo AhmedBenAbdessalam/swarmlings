@@ -215,7 +215,7 @@ func BuildUI(world *sim.World, cfg *config.Config, scale float64) ebitenui.UI {
 		),
 	)
 
-	panel.AddChild(widget.NewText(widget.TextOpts.Text("Boid Parameters", &titleFace, textPrimary)))
+	panel.AddChild(widget.NewText(widget.TextOpts.Text("Ling Parameters", &titleFace, textPrimary)))
 	panel.AddChild(makeSeparator())
 
 	panel.AddChild(makeHeader("Forces"))

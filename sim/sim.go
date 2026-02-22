@@ -3,7 +3,7 @@ package sim
 import "math"
 
 type World struct {
-	Boids           []Boid
+	Lings           []Ling
 	Width           int
 	Height          int
 	AvoidanceFactor float64
@@ -13,12 +13,12 @@ type World struct {
 	AvoidanceRadius float64
 	MaxSpeed        float64
 	grid            *Grid
-	neighbors       []Boid
+	neighbors       []Ling
 }
 
-func New(boids []Boid, w, h int) World {
+func New(lings []Ling, w, h int) World {
 	return World{
-		Boids:           boids,
+		Lings:           lings,
 		Width:           w,
 		Height:          h,
 		AvoidanceFactor: 1.0,
@@ -39,34 +39,34 @@ func (w *World) Update() {
 	if w.grid == nil || w.grid.NeedsRebuild(w.Width, w.Height, cellSize) {
 		w.grid = NewGrid(w.Width, w.Height, cellSize)
 	}
-	w.grid.Populate(w.Boids)
+	w.grid.Populate(w.Lings)
 
-	for i := range w.Boids {
-		w.neighbors = w.grid.Neighbors(w.Boids[i].X, w.Boids[i].Y, i, w.Boids, w.neighbors)
+	for i := range w.Lings {
+		w.neighbors = w.grid.Neighbors(w.Lings[i].X, w.Lings[i].Y, i, w.Lings, w.neighbors)
 
-		vx, vy := w.Boids[i].Avoid(w.neighbors, w.AvoidanceFactor, w.AvoidanceRadius)
-		vx2, vy2 := w.Boids[i].Align(w.neighbors, w.AlignmentFactor, w.DetectionRadius)
+		vx, vy := w.Lings[i].Avoid(w.neighbors, w.AvoidanceFactor, w.AvoidanceRadius)
+		vx2, vy2 := w.Lings[i].Align(w.neighbors, w.AlignmentFactor, w.DetectionRadius)
 		vx += vx2
 		vy += vy2
-		vx2, vy2 = w.Boids[i].Gather(w.neighbors, w.GatheringFactor, w.DetectionRadius)
+		vx2, vy2 = w.Lings[i].Gather(w.neighbors, w.GatheringFactor, w.DetectionRadius)
 		vx += vx2
 		vy += vy2
-		w.Boids[i].VX += vx
-		w.Boids[i].VY += vy
-		speed := math.Hypot(w.Boids[i].VX, w.Boids[i].VY)
+		w.Lings[i].VX += vx
+		w.Lings[i].VY += vy
+		speed := math.Hypot(w.Lings[i].VX, w.Lings[i].VY)
 		if speed > w.MaxSpeed {
-			w.Boids[i].VX = w.Boids[i].VX / speed * w.MaxSpeed
-			w.Boids[i].VY = w.Boids[i].VY / speed * w.MaxSpeed
+			w.Lings[i].VX = w.Lings[i].VX / speed * w.MaxSpeed
+			w.Lings[i].VY = w.Lings[i].VY / speed * w.MaxSpeed
 		}
 
-		w.Boids[i].Move()
-		w.Boids[i].Wrap(w.Width, w.Height)
+		w.Lings[i].Move()
+		w.Lings[i].Wrap(w.Width, w.Height)
 	}
 }
 
 func (w *World) UpdatePositions(ratioX, ratioY float64) {
-	for i := range w.Boids {
-		w.Boids[i].X *= ratioX
-		w.Boids[i].Y *= ratioY
+	for i := range w.Lings {
+		w.Lings[i].X *= ratioX
+		w.Lings[i].Y *= ratioY
 	}
 }

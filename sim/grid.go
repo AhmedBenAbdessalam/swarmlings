@@ -24,13 +24,13 @@ func NewGrid(width, height int, cellSize float64) *Grid {
 	}
 }
 
-func (g *Grid) Populate(boids []Boid) {
+func (g *Grid) Populate(lings []Ling) {
 	// Reset length, keep capacity
 	for i := range g.cells {
 		g.cells[i] = g.cells[i][:0]
 	}
 
-	for i, b := range boids {
+	for i, b := range lings {
 		col := int(b.X / g.cellSize)
 		row := int(b.Y / g.cellSize)
 		if col < 0 {
@@ -48,7 +48,7 @@ func (g *Grid) Populate(boids []Boid) {
 	}
 }
 
-func (g *Grid) Neighbors(x, y float64, excludeIndex int, boids []Boid, buf []Boid) []Boid {
+func (g *Grid) Neighbors(x, y float64, excludeIndex int, lings []Ling, buf []Ling) []Ling {
 	buf = buf[:0]
 
 	col := int(x / g.cellSize)
@@ -89,7 +89,7 @@ func (g *Grid) Neighbors(x, y float64, excludeIndex int, boids []Boid, buf []Boi
 
 			for _, bi := range g.cells[cellIdx] {
 				if bi != excludeIndex {
-					buf = append(buf, boids[bi])
+					buf = append(buf, lings[bi])
 				}
 			}
 		}

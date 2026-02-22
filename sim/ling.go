@@ -1,16 +1,16 @@
 package sim
 
-type Boid struct {
+type Ling struct {
 	X, Y, VX, VY float64
 	Size         float64
 }
 
-func (b *Boid) Move() {
+func (b *Ling) Move() {
 	b.X += b.VX
 	b.Y += b.VY
 }
 
-func (b *Boid) Avoid(neighbors []Boid, factor, avoidanceRadius float64) (vx float64, vy float64) {
+func (b *Ling) Avoid(neighbors []Ling, factor, avoidanceRadius float64) (vx float64, vy float64) {
 	for _, other := range neighbors {
 		dx := other.X - b.X
 		dy := other.Y - b.Y
@@ -23,7 +23,7 @@ func (b *Boid) Avoid(neighbors []Boid, factor, avoidanceRadius float64) (vx floa
 	return vx * factor, vy * factor
 }
 
-func (b *Boid) Align(neighbors []Boid, factor, detectionRadius float64) (vx float64, vy float64) {
+func (b *Ling) Align(neighbors []Ling, factor, detectionRadius float64) (vx float64, vy float64) {
 	averageVX, averageVY, count := 0.0, 0.0, 0
 	for _, other := range neighbors {
 		if DistanceSquared(b.X, b.Y, other.X, other.Y) < detectionRadius*detectionRadius {
@@ -40,7 +40,7 @@ func (b *Boid) Align(neighbors []Boid, factor, detectionRadius float64) (vx floa
 	return (averageVX - b.VX) * factor, (averageVY - b.VY) * factor
 }
 
-func (b *Boid) Gather(neighbors []Boid, factor, detectionRadius float64) (vx float64, vy float64) {
+func (b *Ling) Gather(neighbors []Ling, factor, detectionRadius float64) (vx float64, vy float64) {
 	averageX, averageY, count := 0.0, 0.0, 0
 	for _, other := range neighbors {
 		if DistanceSquared(b.X, b.Y, other.X, other.Y) < detectionRadius*detectionRadius {
@@ -58,7 +58,7 @@ func (b *Boid) Gather(neighbors []Boid, factor, detectionRadius float64) (vx flo
 
 }
 
-func (b *Boid) Wrap(width, height int) {
+func (b *Ling) Wrap(width, height int) {
 	w, h := float64(width), float64(height)
 	if b.X < 0 {
 		b.X += w

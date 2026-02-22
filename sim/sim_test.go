@@ -10,99 +10,99 @@ import (
 func TestBound(t *testing.T) {
 	testCases := []struct {
 		desc  string
-		Boid  Boid
+		Ling  Ling
 		World World
 	}{
 		{
-			desc:  "boid should wrap around the world when it goes out of bounds",
-			Boid:  Boid{X: 10, Y: 50, VX: -20, VY: 0},
+			desc:  "ling should wrap around the world when it goes out of bounds",
+			Ling:  Ling{X: 10, Y: 50, VX: -20, VY: 0},
 			World: World{Width: 100, Height: 100},
 		},
 		{
-			desc:  "boid should wrap around the world when it goes out of bounds",
-			Boid:  Boid{X: 100, Y: 50, VX: 10, VY: 0},
+			desc:  "ling should wrap around the world when it goes out of bounds",
+			Ling:  Ling{X: 100, Y: 50, VX: 10, VY: 0},
 			World: World{Width: 100, Height: 100},
 		},
 		{
-			desc:  "boid should wrap around the world when it goes out of bounds",
-			Boid:  Boid{X: 50, Y: 10, VX: 0, VY: -20},
+			desc:  "ling should wrap around the world when it goes out of bounds",
+			Ling:  Ling{X: 50, Y: 10, VX: 0, VY: -20},
 			World: World{Width: 100, Height: 100},
 		},
 		{
-			desc:  "boid should wrap around the world when it goes out of bounds",
-			Boid:  Boid{X: 50, Y: 100, VX: 0, VY: 10},
+			desc:  "ling should wrap around the world when it goes out of bounds",
+			Ling:  Ling{X: 50, Y: 100, VX: 0, VY: 10},
 			World: World{Width: 100, Height: 100},
 		},
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 			world := tC.World
-			world.Boids = []Boid{tC.Boid}
+			world.Lings = []Ling{tC.Ling}
 			world.Update()
-			boid := world.Boids[0]
+			ling := world.Lings[0]
 
-			if boid.X < 0 || boid.X > float64(world.Width) || boid.Y < 0 || boid.Y > float64(world.Height) {
-				t.Errorf("expected boid to be in bounds, but it was out of bounds: %v", boid)
+			if ling.X < 0 || ling.X > float64(world.Width) || ling.Y < 0 || ling.Y > float64(world.Height) {
+				t.Errorf("expected ling to be in bounds, but it was out of bounds: %v", ling)
 			}
 
 		})
 	}
 }
 
-// updateBruteForce is the original O(n²) implementation for equivalence testing.
+// updateBruteForce is the original O(n^2) implementation for equivalence testing.
 func updateBruteForce(w *World) {
-	others := make([]Boid, len(w.Boids)-1)
-	for i := range w.Boids {
-		copy(others[:i], w.Boids[:i])
-		copy(others[i:], w.Boids[i+1:])
+	others := make([]Ling, len(w.Lings)-1)
+	for i := range w.Lings {
+		copy(others[:i], w.Lings[:i])
+		copy(others[i:], w.Lings[i+1:])
 
-		vx, vy := w.Boids[i].Avoid(others, w.AvoidanceFactor, w.AvoidanceRadius)
-		vx2, vy2 := w.Boids[i].Align(others, w.AlignmentFactor, w.DetectionRadius)
+		vx, vy := w.Lings[i].Avoid(others, w.AvoidanceFactor, w.AvoidanceRadius)
+		vx2, vy2 := w.Lings[i].Align(others, w.AlignmentFactor, w.DetectionRadius)
 		vx += vx2
 		vy += vy2
-		vx2, vy2 = w.Boids[i].Gather(others, w.GatheringFactor, w.DetectionRadius)
+		vx2, vy2 = w.Lings[i].Gather(others, w.GatheringFactor, w.DetectionRadius)
 		vx += vx2
 		vy += vy2
-		w.Boids[i].VX += vx
-		w.Boids[i].VY += vy
-		speed := math.Hypot(w.Boids[i].VX, w.Boids[i].VY)
+		w.Lings[i].VX += vx
+		w.Lings[i].VY += vy
+		speed := math.Hypot(w.Lings[i].VX, w.Lings[i].VY)
 		if speed > w.MaxSpeed {
-			w.Boids[i].VX = w.Boids[i].VX / speed * w.MaxSpeed
-			w.Boids[i].VY = w.Boids[i].VY / speed * w.MaxSpeed
+			w.Lings[i].VX = w.Lings[i].VX / speed * w.MaxSpeed
+			w.Lings[i].VY = w.Lings[i].VY / speed * w.MaxSpeed
 		}
-		w.Boids[i].Move()
-		w.Boids[i].Wrap(w.Width, w.Height)
+		w.Lings[i].Move()
+		w.Lings[i].Wrap(w.Width, w.Height)
 	}
 }
 
 func TestGridEquivalence(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 	n := 200
-	boids1 := make([]Boid, n)
-	boids2 := make([]Boid, n)
-	for i := range boids1 {
-		b := Boid{
+	lings1 := make([]Ling, n)
+	lings2 := make([]Ling, n)
+	for i := range lings1 {
+		l := Ling{
 			X:  rng.Float64() * 1000,
 			Y:  rng.Float64() * 1000,
 			VX: rng.Float64()*4 - 2,
 			VY: rng.Float64()*4 - 2,
 		}
-		boids1[i] = b
-		boids2[i] = b
+		lings1[i] = l
+		lings2[i] = l
 	}
 
-	grid := New(boids1, 1000, 1000)
-	brute := New(boids2, 1000, 1000)
+	grid := New(lings1, 1000, 1000)
+	brute := New(lings2, 1000, 1000)
 
 	grid.Update()
 	updateBruteForce(&brute)
 
-	for i := range boids1 {
-		g := grid.Boids[i]
-		b := brute.Boids[i]
+	for i := range lings1 {
+		g := grid.Lings[i]
+		b := brute.Lings[i]
 		if math.Abs(g.X-b.X) > 1e-9 || math.Abs(g.Y-b.Y) > 1e-9 ||
 			math.Abs(g.VX-b.VX) > 1e-9 || math.Abs(g.VY-b.VY) > 1e-9 {
-			t.Errorf("boid %d diverged:\n  grid:  {X:%.6f Y:%.6f VX:%.6f VY:%.6f}\n  brute: {X:%.6f Y:%.6f VX:%.6f VY:%.6f}",
+			t.Errorf("ling %d diverged:\n  grid:  {X:%.6f Y:%.6f VX:%.6f VY:%.6f}\n  brute: {X:%.6f Y:%.6f VX:%.6f VY:%.6f}",
 				i, g.X, g.Y, g.VX, g.VY, b.X, b.Y, b.VX, b.VY)
 		}
 	}
@@ -112,16 +112,16 @@ func BenchmarkUpdate(b *testing.B) {
 	for _, n := range []int{500, 1000, 5000, 10000, 20000} {
 		b.Run(fmt.Sprintf("N=%d", n), func(b *testing.B) {
 			rng := rand.New(rand.NewSource(42))
-			boids := make([]Boid, n)
-			for j := range boids {
-				boids[j] = Boid{
+			lings := make([]Ling, n)
+			for j := range lings {
+				lings[j] = Ling{
 					X:  rng.Float64() * 1000,
 					Y:  rng.Float64() * 1000,
 					VX: rng.Float64()*2 - 1,
 					VY: rng.Float64()*2 - 1,
 				}
 			}
-			world := New(boids, 1000, 1000)
+			world := New(lings, 1000, 1000)
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				world.Update()

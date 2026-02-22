@@ -12,10 +12,10 @@ import (
 )
 
 func main() {
-	boids := make([]sim.Boid, 1000)
-	world := sim.New(boids, 800, 600)
-	for i := range world.Boids {
-		world.Boids[i] = sim.Boid{
+	lings := make([]sim.Ling, 1000)
+	world := sim.New(lings, 800, 600)
+	for i := range world.Lings {
+		world.Lings[i] = sim.Ling{
 			X:    rand.Float64() * float64(world.Width),
 			Y:    rand.Float64() * float64(world.Height),
 			VX:   rand.Float64() * 1,

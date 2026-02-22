@@ -4,7 +4,7 @@ Flocking sim in Go with Ebitengine. The end goal is little critters with neural 
 
 ## Roadmap
 
-- [x] Basic flocking (separation, alignment, cohesion) — 500 boids at 60 FPS
+- [x] Basic flocking (separation, alignment, cohesion) — 500 lings at 60 FPS
 - [x] Triangle rendering with debug overlays for detection/avoidance radii
 - [x] In-game UI for tweaking parameters, saved to `config.json`
 - [ ] Spatial partitioning (grid or quadtree) to get past the O(n^2) neighbor check
@@ -28,7 +28,7 @@ Go, Ebitengine v2, EbitenUI
 main.go              entry point
 config.json          simulation parameters
 sim/
-  boid.go            boid struct + flocking rules
+  ling.go            ling struct + flocking rules
   sim.go             world update loop
   sim_test.go        tests
 render/

@@ -44,8 +44,8 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	for _, b := range g.World.Boids {
-		g.drawBoid(screen, b, g.Texture)
+	for _, b := range g.World.Lings {
+		g.drawLing(screen, b, g.Texture)
 	}
 	if g.ShowUI {
 		g.Ui.Draw(screen)
@@ -74,15 +74,15 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return outsideWidth, outsideHeight
 }
 
-func (g *Game) drawBoid(screen *ebiten.Image, boid sim.Boid, texture *ebiten.Image) {
-	angle := math.Atan2(boid.VY, boid.VX)
-	size := boid.Size
+func (g *Game) drawLing(screen *ebiten.Image, ling sim.Ling, texture *ebiten.Image) {
+	angle := math.Atan2(ling.VY, ling.VX)
+	size := ling.Size
 	vertices := make([]ebiten.Vertex, 3)
 	offsets := []float64{0, math.Pi * 3 / 4, -math.Pi * 3 / 4}
 	for i := range 3 {
 		vertices[i] = ebiten.Vertex{
-			DstX:   float32(boid.X + size*math.Cos(angle+offsets[i])),
-			DstY:   float32(boid.Y + size*math.Sin(angle+offsets[i])),
+			DstX:   float32(ling.X + size*math.Cos(angle+offsets[i])),
+			DstY:   float32(ling.Y + size*math.Sin(angle+offsets[i])),
 			ColorR: 1,
 			ColorG: 1,
 			ColorB: 1,
@@ -93,7 +93,7 @@ func (g *Game) drawBoid(screen *ebiten.Image, boid sim.Boid, texture *ebiten.Ima
 	screen.DrawTriangles(vertices, []uint16{0, 1, 2}, texture, nil)
 
 	if g.DebugMode {
-		vector.StrokeCircle(screen, float32(boid.X), float32(boid.Y), float32(g.World.DetectionRadius), 1, color.RGBA{80, 80, 80, 80}, true)
-		vector.StrokeCircle(screen, float32(boid.X), float32(boid.Y), float32(g.World.AvoidanceRadius), 1, color.RGBA{0, 180, 0, 80}, true)
+		vector.StrokeCircle(screen, float32(ling.X), float32(ling.Y), float32(g.World.DetectionRadius), 1, color.RGBA{80, 80, 80, 80}, true)
+		vector.StrokeCircle(screen, float32(ling.X), float32(ling.Y), float32(g.World.AvoidanceRadius), 1, color.RGBA{0, 180, 0, 80}, true)
 	}
 }
