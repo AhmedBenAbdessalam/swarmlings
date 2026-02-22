@@ -1,0 +1,7 @@
+{
+  "avoidance_factor": 0.8,
+  "alignment_factor": 0.006,
+  "gathering_factor": 0.001,
+  "avoidance_radius": 10,
+  "detection_radius": 120
+}
