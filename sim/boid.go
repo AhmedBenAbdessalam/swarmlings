@@ -1,12 +1,9 @@
 package sim
 
-import "math"
-
 type Boid struct {
 	X, Y, VX, VY float64
 	Size         float64
 }
-
 
 func (b *Boid) Move() {
 	b.X += b.VX
@@ -19,10 +16,10 @@ func (b *Boid) Avoid(others []Boid, index int, factor, avoidanceRadius float64) 
 		if i != index {
 			dx := other.X - b.X
 			dy := other.Y - b.Y
-			dist := math.Hypot(dx, dy)
-			if dist < avoidanceRadius {
-				vx -= dx / dist
-				vy -= dy / dist
+			distsq := DistanceSquared(b.X, b.Y, other.X, other.Y)
+			if distsq < avoidanceRadius*avoidanceRadius {
+				vx -= dx / distsq
+				vy -= dy / distsq
 			}
 		}
 	}
@@ -33,7 +30,7 @@ func (b *Boid) Align(others []Boid, index int, factor, detectionRadius float64) 
 	averageVX, averageVY, count := 0.0, 0.0, 0
 	for i, other := range others {
 		if i != index {
-			if math.Hypot(other.X-b.X, other.Y-b.Y) < detectionRadius {
+			if DistanceSquared(b.X, b.Y, other.X, other.Y) < detectionRadius*detectionRadius {
 				averageVX += other.VX
 				averageVY += other.VY
 				count++
@@ -52,7 +49,7 @@ func (b *Boid) Gather(others []Boid, index int, factor, detectionRadius float64)
 	averageX, averageY, count := 0.0, 0.0, 0
 	for i, other := range others {
 		if i != index {
-			if math.Hypot(other.X-b.X, other.Y-b.Y) < detectionRadius {
+			if DistanceSquared(b.X, b.Y, other.X, other.Y) < detectionRadius*detectionRadius {
 				averageX += other.X
 				averageY += other.Y
 				count++

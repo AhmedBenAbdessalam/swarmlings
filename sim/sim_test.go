@@ -43,3 +43,14 @@ func TestBound(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkUpdate(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		boids := make([]Boid, 10000)
+		for j := range boids {
+			boids[j] = Boid{X: float64(j), Y: float64(j), VX: 1, VY: 1}
+		}
+		world := New(boids, 1000, 1000)
+		world.Update()
+	}
+}
