@@ -64,30 +64,17 @@ func (g *Grid) Neighbors(x, y float64, excludeIndex int, lings []Ling, buf []Lin
 		row = g.rows - 1
 	}
 
-	// Dedup visited cells when grid < 3x3
-	var visited [9]int
-	visitCount := 0
-
 	for dr := -1; dr <= 1; dr++ {
+		nr := row + dr
+		if nr < 0 || nr >= g.rows {
+			continue
+		}
 		for dc := -1; dc <= 1; dc++ {
-			nc := (col + dc + g.cols) % g.cols
-			nr := (row + dr + g.rows) % g.rows
-			cellIdx := nr*g.cols + nc
-
-			dup := false
-			for v := 0; v < visitCount; v++ {
-				if visited[v] == cellIdx {
-					dup = true
-					break
-				}
-			}
-			if dup {
+			nc := col + dc
+			if nc < 0 || nc >= g.cols {
 				continue
 			}
-			visited[visitCount] = cellIdx
-			visitCount++
-
-			for _, bi := range g.cells[cellIdx] {
+			for _, bi := range g.cells[nr*g.cols+nc] {
 				if bi != excludeIndex {
 					buf = append(buf, lings[bi])
 				}

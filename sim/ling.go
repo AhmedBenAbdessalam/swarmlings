@@ -58,16 +58,45 @@ func (b *Ling) Gather(neighbors []Ling, factor, detectionRadius float64) (vx flo
 
 }
 
-func (b *Ling) Wrap(width, height int) {
-	w, h := float64(width), float64(height)
+func (b *Ling) WallAvoid(width, height, margin, strength float64) (vx, vy float64) {
+	if b.X < margin {
+		t := (margin - b.X) / margin
+		vx += strength * t * t
+	} else if d := width - b.X; d < margin {
+		t := (margin - d) / margin
+		vx -= strength * t * t
+	}
+	if b.Y < margin {
+		t := (margin - b.Y) / margin
+		vy += strength * t * t
+	} else if d := height - b.Y; d < margin {
+		t := (margin - d) / margin
+		vy -= strength * t * t
+	}
+	return vx, vy
+}
+
+func (b *Ling) Clamp(width, height float64) {
 	if b.X < 0 {
-		b.X += w
-	} else if b.X > w {
-		b.X -= w
+		b.X = 0
+		if b.VX < 0 {
+			b.VX = -b.VX
+		}
+	} else if b.X > width {
+		b.X = width
+		if b.VX > 0 {
+			b.VX = -b.VX
+		}
 	}
 	if b.Y < 0 {
-		b.Y += h
-	} else if b.Y > h {
-		b.Y -= h
+		b.Y = 0
+		if b.VY < 0 {
+			b.VY = -b.VY
+		}
+	} else if b.Y > height {
+		b.Y = height
+		if b.VY > 0 {
+			b.VY = -b.VY
+		}
 	}
 }

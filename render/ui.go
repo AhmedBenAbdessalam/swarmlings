@@ -248,6 +248,16 @@ func BuildUI(world *sim.World, cfg *config.Config, scale float64) ebitenui.UI {
 
 	panel.AddChild(makeSeparator())
 
+	panel.AddChild(makeHeader("Walls"))
+	panel.AddChild(makeRow("Margin", 10, 200, &cfg.WallMargin, "%.0f", func(v float64) {
+		world.WallMargin = v
+	}))
+	panel.AddChild(makeRow("Force", 0, 5.0, &cfg.WallForce, "%.2f", func(v float64) {
+		world.WallForce = v
+	}))
+
+	panel.AddChild(makeSeparator())
+
 	btnContainer := widget.NewContainer(
 		widget.ContainerOpts.Layout(widget.NewRowLayout(
 			widget.RowLayoutOpts.Direction(widget.DirectionHorizontal),

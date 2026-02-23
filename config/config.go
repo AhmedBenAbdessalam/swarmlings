@@ -14,16 +14,20 @@ type Config struct {
 	AvoidanceRadius float64 `json:"avoidance_radius"`
 	DetectionRadius float64 `json:"detection_radius"`
 	MaxSpeed        float64 `json:"max_speed"`
+	WallMargin      float64 `json:"wall_margin"`
+	WallForce       float64 `json:"wall_force"`
 }
 
 func Default() Config {
 	return Config{
 		AvoidanceFactor: 1.0,
-		AlignmentFactor: 0.005,
-		GatheringFactor: 0.001,
+		AlignmentFactor: 0.003,
+		GatheringFactor: 0.0005,
 		AvoidanceRadius: 20,
 		DetectionRadius: 100,
 		MaxSpeed:        3,
+		WallMargin:      75,
+		WallForce:       1.5,
 	}
 }
 

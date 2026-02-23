@@ -9,34 +9,29 @@ import (
 
 func TestBound(t *testing.T) {
 	testCases := []struct {
-		desc  string
-		Ling  Ling
-		World World
+		desc string
+		Ling Ling
 	}{
 		{
-			desc:  "ling should wrap around the world when it goes out of bounds",
-			Ling:  Ling{X: 10, Y: 50, VX: -20, VY: 0},
-			World: World{Width: 100, Height: 100},
+			desc: "ling moving left past boundary gets clamped",
+			Ling: Ling{X: 10, Y: 50, VX: -20, VY: 0},
 		},
 		{
-			desc:  "ling should wrap around the world when it goes out of bounds",
-			Ling:  Ling{X: 100, Y: 50, VX: 10, VY: 0},
-			World: World{Width: 100, Height: 100},
+			desc: "ling moving right past boundary gets clamped",
+			Ling: Ling{X: 100, Y: 50, VX: 10, VY: 0},
 		},
 		{
-			desc:  "ling should wrap around the world when it goes out of bounds",
-			Ling:  Ling{X: 50, Y: 10, VX: 0, VY: -20},
-			World: World{Width: 100, Height: 100},
+			desc: "ling moving up past boundary gets clamped",
+			Ling: Ling{X: 50, Y: 10, VX: 0, VY: -20},
 		},
 		{
-			desc:  "ling should wrap around the world when it goes out of bounds",
-			Ling:  Ling{X: 50, Y: 100, VX: 0, VY: 10},
-			World: World{Width: 100, Height: 100},
+			desc: "ling moving down past boundary gets clamped",
+			Ling: Ling{X: 50, Y: 100, VX: 0, VY: 10},
 		},
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-			world := tC.World
+			world := World{Width: 100, Height: 100, WallMargin: 25, WallForce: 1.5, MaxSpeed: 3}
 			world.Lings = []Ling{tC.Ling}
 			world.Update()
 			ling := world.Lings[0]
@@ -44,7 +39,6 @@ func TestBound(t *testing.T) {
 			if ling.X < 0 || ling.X > float64(world.Width) || ling.Y < 0 || ling.Y > float64(world.Height) {
 				t.Errorf("expected ling to be in bounds, but it was out of bounds: %v", ling)
 			}
-
 		})
 	}
 }
@@ -63,6 +57,9 @@ func updateBruteForce(w *World) {
 		vx2, vy2 = w.Lings[i].Gather(others, w.GatheringFactor, w.DetectionRadius)
 		vx += vx2
 		vy += vy2
+		vx2, vy2 = w.Lings[i].WallAvoid(float64(w.Width), float64(w.Height), w.WallMargin, w.WallForce)
+		vx += vx2
+		vy += vy2
 		w.Lings[i].VX += vx
 		w.Lings[i].VY += vy
 		speed := math.Hypot(w.Lings[i].VX, w.Lings[i].VY)
@@ -71,7 +68,7 @@ func updateBruteForce(w *World) {
 			w.Lings[i].VY = w.Lings[i].VY / speed * w.MaxSpeed
 		}
 		w.Lings[i].Move()
-		w.Lings[i].Wrap(w.Width, w.Height)
+		w.Lings[i].Clamp(float64(w.Width), float64(w.Height))
 	}
 }
 

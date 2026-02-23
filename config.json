@@ -1,8 +1,10 @@
 {
-  "avoidance_factor": 1.7,
-  "alignment_factor": 0.006,
-  "gathering_factor": 0.001,
-  "avoidance_radius": 21,
-  "detection_radius": 120,
-  "max_speed": 3
+  "avoidance_factor": 1,
+  "alignment_factor": 0.0058,
+  "gathering_factor": 0.00092,
+  "avoidance_radius": 20,
+  "detection_radius": 100,
+  "max_speed": 2,
+  "wall_margin": 105,
+  "wall_force": 0.55
 }

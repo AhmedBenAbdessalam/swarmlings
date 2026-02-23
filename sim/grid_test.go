@@ -103,7 +103,7 @@ func TestNeighborsExcludesSelf(t *testing.T) {
 	}
 }
 
-func TestNeighborsToroidalWrap(t *testing.T) {
+func TestNeighborsEdgeCells(t *testing.T) {
 	g := NewGrid(200, 200, 50) // 4x4 grid
 	lings := []Ling{
 		{X: 10, Y: 10},   // cell (0,0) - top-left corner
@@ -113,18 +113,21 @@ func TestNeighborsToroidalWrap(t *testing.T) {
 	}
 	g.Populate(lings)
 
-	// Querying from top-left should wrap and find top-right and bottom-left
+	// Corner cell should only check 4 cells (no wrapping), not find distant corners
 	var buf []Ling
 	neighbors := g.Neighbors(10, 10, 0, lings, buf)
+	if len(neighbors) != 0 {
+		t.Fatalf("expected 0 neighbors at corner (no wrapping), got %d", len(neighbors))
+	}
 
-	// Should find lings 1, 2, and 3 - all are in adjacent cells via toroidal wrap
-	if len(neighbors) != 3 {
-		t.Fatalf("expected 3 neighbors via toroidal wrap, got %d", len(neighbors))
+	// Edge cell should find adjacent lings only
+	neighbors = g.Neighbors(190, 190, 3, lings, buf)
+	if len(neighbors) != 0 {
+		t.Fatalf("expected 0 neighbors at opposite corner, got %d", len(neighbors))
 	}
 }
 
 func TestNeighborsSmallGrid(t *testing.T) {
-	// Grid smaller than 3x3 — cells should be deduped
 	g := NewGrid(100, 100, 60) // 2x2 grid (ceil(100/60)=2)
 	lings := []Ling{
 		{X: 10, Y: 10},
@@ -134,10 +137,10 @@ func TestNeighborsSmallGrid(t *testing.T) {
 
 	var buf []Ling
 	neighbors := g.Neighbors(10, 10, 0, lings, buf)
-	// With a 2x2 grid and toroidal wrap, all cells are neighbors.
-	// Should still find ling 1, not duplicate it.
+	// 2x2 grid, querying (0,0) checks cells (0,0) and (0,1) and (1,0) and (1,1).
+	// Ling 1 is in (1,1), which is adjacent. Should find it once.
 	if len(neighbors) != 1 {
-		t.Fatalf("expected 1 neighbor (deduped small grid), got %d", len(neighbors))
+		t.Fatalf("expected 1 neighbor in small grid, got %d", len(neighbors))
 	}
 }
 

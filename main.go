@@ -1,12 +1,12 @@
 package main
 
 import (
-	"swarmlings/config"
-	"swarmlings/render"
-	"swarmlings/sim"
 	"image/color"
 	"log"
 	"math/rand"
+	"swarmlings/config"
+	"swarmlings/render"
+	"swarmlings/sim"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -20,7 +20,7 @@ func main() {
 			Y:    rand.Float64() * float64(world.Height),
 			VX:   rand.Float64() * 1,
 			VY:   rand.Float64() * 1,
-			Size: 10,
+			Size: 5,
 		}
 	}
 
@@ -32,6 +32,8 @@ func main() {
 	world.AvoidanceRadius = cfg.AvoidanceRadius
 	world.DetectionRadius = cfg.DetectionRadius
 	world.MaxSpeed = cfg.MaxSpeed
+	world.WallMargin = cfg.WallMargin
+	world.WallForce = cfg.WallForce
 
 	ui := render.BuildUI(&world, &cfg, 1.0)
 

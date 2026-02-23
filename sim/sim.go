@@ -12,6 +12,8 @@ type World struct {
 	DetectionRadius float64
 	AvoidanceRadius float64
 	MaxSpeed        float64
+	WallMargin      float64
+	WallForce       float64
 	grid            *Grid
 	neighbors       []Ling
 }
@@ -22,11 +24,13 @@ func New(lings []Ling, w, h int) World {
 		Width:           w,
 		Height:          h,
 		AvoidanceFactor: 1.0,
-		AlignmentFactor: 0.005,
-		GatheringFactor: 0.001,
+		AlignmentFactor: 0.003,
+		GatheringFactor: 0.0005,
 		DetectionRadius: 100,
 		AvoidanceRadius: 20,
 		MaxSpeed:        3,
+		WallMargin:      75,
+		WallForce:       1.5,
 	}
 }
 
@@ -51,6 +55,9 @@ func (w *World) Update() {
 		vx2, vy2 = w.Lings[i].Gather(w.neighbors, w.GatheringFactor, w.DetectionRadius)
 		vx += vx2
 		vy += vy2
+		vx2, vy2 = w.Lings[i].WallAvoid(float64(w.Width), float64(w.Height), w.WallMargin, w.WallForce)
+		vx += vx2
+		vy += vy2
 		w.Lings[i].VX += vx
 		w.Lings[i].VY += vy
 		speed := math.Hypot(w.Lings[i].VX, w.Lings[i].VY)
@@ -60,7 +67,7 @@ func (w *World) Update() {
 		}
 
 		w.Lings[i].Move()
-		w.Lings[i].Wrap(w.Width, w.Height)
+		w.Lings[i].Clamp(float64(w.Width), float64(w.Height))
 	}
 }
 
